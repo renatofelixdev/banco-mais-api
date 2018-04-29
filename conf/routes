@@ -2,6 +2,22 @@
 # This file defines all application routes (Higher priority routes first)
 # ~~~~
 
+GET     /api/banks                          api.BankApiController.all
+GET     /api/bank/:id                       api.BankApiController.byId(id:Long)
+POST    /api/bank                           api.BankApiController.save
+PUT     /api/bank/:id                       api.BankApiController.update(id:Long)
+PUT     /api/bank/:id/status                api.BankApiController.alterStatus(id:Long)
+DELETE  /api/bank/:id                       api.BankApiController.delete(id:Long)
+
+GET     /api/bank-agencies                         api.BankAgencyApiController.all
+GET     /api/bank-agencies/bank/:idBank            api.BankAgencyApiController.byBank(idBank:Long)
+GET     /api/bank-agency/:id                       api.BankAgencyApiController.byId(id:Long)
+POST    /api/bank-agency                           api.BankAgencyApiController.save
+PUT     /api/bank-agency/:id                       api.BankAgencyApiController.update(id:Long)
+PUT     /api/bank-agency/:id/status                api.BankAgencyApiController.alterStatus(id:Long)
+DELETE  /api/bank-agency/:id                       api.BankAgencyApiController.delete(id:Long)
+
+
 GET     /api/user-master/:login/:password   api.UserMasterApiController.create(login:String, password:String)
 
 # Map static resources from the /public folder to the /assets URL path
