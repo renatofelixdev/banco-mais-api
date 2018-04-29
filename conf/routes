@@ -27,6 +27,12 @@ PUT     /api/bank-account/:id                       api.BankAccountApiController
 PUT     /api/bank-account/:id/status                api.BankAccountApiController.alterStatus(id:Long)
 DELETE  /api/bank-account/:id                       api.BankAccountApiController.delete(id:Long)
 
+GET     /api/users-client                          api.UserClientApiController.all
+GET     /api/user-client/:id                       api.UserClientApiController.byId(id:Long)
+POST    /api/user-client                           api.UserClientApiController.save
+PUT     /api/user-client/:id                       api.UserClientApiController.update(id:Long)
+PUT     /api/user-client/:id/status                api.UserClientApiController.alterStatus(id:Long)
+DELETE  /api/user-client/:id                       api.UserClientApiController.delete(id:Long)
 
 GET     /api/user-master/:login/:password   api.UserMasterApiController.create(login:String, password:String)
 
