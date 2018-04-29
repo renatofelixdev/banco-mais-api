@@ -34,6 +34,11 @@ PUT     /api/user-client/:id                       api.UserClientApiController.u
 PUT     /api/user-client/:id/status                api.UserClientApiController.alterStatus(id:Long)
 DELETE  /api/user-client/:id                       api.UserClientApiController.delete(id:Long)
 
+GET     /api/bank-statement                         api.BankingOperationApiController.bankStatement
+POST    /api/deposit                                api.BankingOperationApiController.deposit
+POST    /api/bank-transfer                          api.BankingOperationApiController.bankTransfer
+POST    /api/account-withdrawal                     api.BankingOperationApiController.accountWithDrawal
+
 GET     /api/user-master/:login/:password   api.UserMasterApiController.create(login:String, password:String)
 
 # Map static resources from the /public folder to the /assets URL path
