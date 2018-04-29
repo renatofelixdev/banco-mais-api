@@ -3,6 +3,7 @@ package api;
 import com.fasterxml.jackson.databind.JsonNode;
 import dao.BankAccountDAO;
 import dao.BankAgencyDAO;
+import dao.UserClientDAO;
 import enums.NotificationStatus;
 import helpers.BankAccountHelper;
 import helpers.UserClientHelper;
@@ -28,6 +29,9 @@ public class BankAccountApiController extends Controller implements ApiControlle
 
     @Inject
     private BankAgencyDAO bankAgencyDAO;
+
+    @Inject
+    private UserClientDAO userClientDAO;
 
     @Inject
     private Utils utils;
@@ -68,8 +72,8 @@ public class BankAccountApiController extends Controller implements ApiControlle
             return utils.badRequest(Json.toJson(notification));
         }
 
-        UserClient userClient = userClientHelper.fill(json);
-        userClient.save();
+        UserClient userClient = verifyUser(json);
+
 
         utils.putValue(json, "userClient", userClient.getId()+"");
 
@@ -99,9 +103,7 @@ public class BankAccountApiController extends Controller implements ApiControlle
             return utils.badRequest(Json.toJson(notification));
         }
 
-        UserClient userClient = userClientHelper.fill(json);
-        //TODO VALIDAR CADASTRO
-        userClient.save();
+        UserClient userClient = verifyUser(json);
 
         utils.putValue(json, "userClient", userClient.getId()+"");
 
@@ -150,5 +152,17 @@ public class BankAccountApiController extends Controller implements ApiControlle
 
         return utils.ok(Json.toJson(utils.notification(NotificationStatus.SUCCESS,
                 "Status alterado com sucesso!")));
+    }
+
+    private UserClient verifyUser(JsonNode json){
+        UserClient userClient = userClientDAO.byCpf(utils.getValueFromJson(json, "cpf"));
+        if(userClient == null){
+            userClient = userClientHelper.fill(json);
+            userClient.save();
+        }else{
+            userClient = userClientHelper.fill(userClient, json);
+            userClient.update();
+        }
+        return userClient;
     }
 }

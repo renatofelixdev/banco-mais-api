@@ -12,8 +12,6 @@ import javax.inject.Inject;
 
 public class UserClientValidator extends ApiValidator{
 
-    @Inject
-    private UserClientDAO userClientDAO;
 
     public UserClientValidator(){
         super.ENTITY = NameEntity.USER_CLIENT;
@@ -33,10 +31,6 @@ public class UserClientValidator extends ApiValidator{
             notification.setStatus(NotificationStatus.ERROR);
             notification.setValidators(validators);
         }
-    }
-
-    public UserClient cpfAlreadyExists(){
-
     }
 
 }

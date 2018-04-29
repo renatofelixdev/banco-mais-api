@@ -19,4 +19,11 @@ public class UserClientDAO implements ApiDAO {
     public UserClient byId(Long id) {
         return userClientFinder.byId(id);
     }
+
+    public UserClient byCpf(String cpf) {
+        return userClientFinder.where()
+                .eq("removed", false)
+                .eq("cpf", cpf)
+                .findUnique();
+    }
 }
