@@ -37,4 +37,17 @@ public abstract class ApiValidator {
             notification.setValidators(validators);
         }
     }
+
+    protected void validInt(JsonNode json, String obj, String entity){
+        if(json.get(obj) != null && !json.get(obj).asText().isEmpty()){
+            try{
+                Integer i = Integer.parseInt(json.get(obj).asText());
+            }catch (Exception e){
+                validators.put(obj, "Selecione um(a) "+entity+"!");
+                notification.setStatus(NotificationStatus.ERROR);
+                notification.setValidators(validators);
+            }
+
+        }
+    }
 }

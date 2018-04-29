@@ -1,9 +1,6 @@
 package models;
 
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
+import javax.persistence.*;
 import java.util.List;
 
 @Entity
@@ -12,10 +9,7 @@ public class UserClient extends ModelMaster {
     private String cpf;
     private String address;
 
-    @ManyToMany
-    @JoinTable(name="user_client_bank_account", joinColumns=
-            {@JoinColumn(name="user_client_id")}, inverseJoinColumns=
-            {@JoinColumn(name="bank_account_id")})
+    @OneToMany(mappedBy = "userClient")
     private List<BankAccount> bankAccountList;
 
     public String getName() {

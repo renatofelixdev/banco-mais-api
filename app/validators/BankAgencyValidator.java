@@ -12,5 +12,7 @@ public class BankAgencyValidator extends ApiValidator {
     protected void validators(JsonNode json) {
         super.validators(json);
         super.requiredField(json, "code");
+        super.requiredField(json, "bank");
+        super.validInt(json, "bank", NameEntity.BANK);
     }
 }

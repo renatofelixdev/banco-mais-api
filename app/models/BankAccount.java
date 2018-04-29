@@ -20,6 +20,9 @@ public class BankAccount extends ModelMaster {
     @ManyToOne
     private BankAgency bankAgency;
 
+    @OneToOne
+    private UserClient userClient;
+
     public String getNumber() {
         return number;
     }
@@ -50,5 +53,13 @@ public class BankAccount extends ModelMaster {
 
     public void setBankAgency(BankAgency bankAgency) {
         this.bankAgency = bankAgency;
+    }
+
+    public UserClient getUserClient() {
+        return userClient;
+    }
+
+    public void setUserClient(UserClient userClient) {
+        this.userClient = userClient;
     }
 }
