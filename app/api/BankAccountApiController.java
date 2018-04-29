@@ -49,6 +49,9 @@ public class BankAccountApiController extends Controller implements ApiControlle
     @Inject
     private UserClientHelper userClientHelper;
 
+    @Inject
+    private UserClientApiController userClientApiController;
+
     @Override
     public Result all() {
         return utils.ok(Json.toJson(bankAccountDAO.all()));
@@ -99,7 +102,7 @@ public class BankAccountApiController extends Controller implements ApiControlle
             return utils.badRequest(Json.toJson(notification));
         }
 
-        UserClient userClient = verifyUser(json);
+        UserClient userClient = userClientApiController.verifyUser(json);
 
 
         utils.putValue(json, "userClient", userClient.getId()+"");
@@ -114,7 +117,7 @@ public class BankAccountApiController extends Controller implements ApiControlle
         Result result = utils.valid(bankAgency, NameEntity.BANK_AGENCY);
         if (result != null) return result;
 
-        BankAccount bankAccount = bankAccountHelper.fill(json, bankAgency);
+        BankAccount bankAccount = bankAccountHelper.fill(json, bankAgency, userClient);
         bankAccount.save();
 
         return utils.ok(Json.toJson(utils.notification(NotificationStatus.SUCCESS,
@@ -125,16 +128,7 @@ public class BankAccountApiController extends Controller implements ApiControlle
     public Result update(Long id) {
         JsonNode json = request().body().asJson();
 
-        Notification notification = userClientValidator.hasErrors(json);
-        if (notification.getStatus() == NotificationStatus.ERROR) {
-            return utils.badRequest(Json.toJson(notification));
-        }
-
-        UserClient userClient = verifyUser(json);
-
-        utils.putValue(json, "userClient", userClient.getId()+"");
-
-        notification = bankAccountValidator.hasErrors(json);
+        Notification notification = bankAccountValidator.hasErrors(json);
         if (notification.getStatus() == NotificationStatus.ERROR) {
             return utils.badRequest(Json.toJson(notification));
         }
@@ -181,15 +175,5 @@ public class BankAccountApiController extends Controller implements ApiControlle
                 "Status alterado com sucesso!")));
     }
 
-    private UserClient verifyUser(JsonNode json){
-        UserClient userClient = userClientDAO.byCpf(utils.getValueFromJson(json, "cpf"));
-        if(userClient == null){
-            userClient = userClientHelper.fill(json);
-            userClient.save();
-        }else{
-            userClient = userClientHelper.fill(userClient, json);
-            userClient.update();
-        }
-        return userClient;
-    }
+
 }
