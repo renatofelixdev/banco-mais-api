@@ -27,8 +27,12 @@ public abstract class ApiValidator {
     }
 
     protected void nameHasError(JsonNode json){
-        if(json.get("name") == null || json.get("name").asText().isEmpty()){
-            validators.put("name", "Digite o nome do (a) "+ ENTITY);
+        this.requiredField(json, "name");
+    }
+
+    protected void requiredField(JsonNode json, String obj){
+        if(json.get(obj) == null || json.get(obj).asText().isEmpty()){
+            validators.put(obj, "Digite o nome do (a) "+ ENTITY);
             notification.setStatus(NotificationStatus.ERROR);
             notification.setValidators(validators);
         }
