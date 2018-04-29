@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import dao.BankAccountDAO;
 import dao.BankAgencyDAO;
 import dao.UserClientDAO;
+import enums.BankAccountType;
 import enums.NotificationStatus;
 import helpers.BankAccountHelper;
 import helpers.UserClientHelper;
@@ -51,6 +52,32 @@ public class BankAccountApiController extends Controller implements ApiControlle
     @Override
     public Result all() {
         return utils.ok(Json.toJson(bankAccountDAO.all()));
+    }
+
+    public Result byUserClient(Long id){
+
+        UserClient userClient = userClientDAO.byId(id);
+
+        Result result = utils.valid(userClient, NameEntity.USER_CLIENT);
+        if (result != null) return result;
+
+        return utils.ok(Json.toJson(userClient.getBankAccountList()));
+
+    }
+
+    public Result byBankAgency(Long id){
+
+        BankAgency bankAgency = bankAgencyDAO.byId(id);
+
+        Result result = utils.valid(bankAgency, NameEntity.BANK_AGENCY);
+        if (result != null) return result;
+
+        return utils.ok(Json.toJson(bankAccountDAO.allByAgency(id)));
+
+    }
+
+    public Result getTypes(){
+        return utils.ok(Json.toJson(BankAccountType.values()));
     }
 
     @Override

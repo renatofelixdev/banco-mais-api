@@ -21,4 +21,11 @@ public class BankAccountDAO implements ApiDAO {
     public BankAccount byId(Long id) {
         return bankAccountFinder.byId(id);
     }
+
+    public List<BankAccount> allByAgency(Long id) {
+        return bankAccountFinder.where()
+                .eq("removed", false)
+                .eq("bankAgency.id", id)
+                .findList();
+    }
 }
