@@ -1,0 +1,112 @@
+# --- Created by Ebean DDL
+# To stop Ebean DDL generation, remove this comment and start using Evolutions
+
+# --- !Ups
+
+create table account_history (
+  id                            bigserial not null,
+  active                        boolean,
+  removed                       boolean,
+  date                          date,
+  operation                     varchar(20),
+  value                         decimal(10,2),
+  date_created                  timestamp not null,
+  date_updated                  timestamp not null,
+  constraint ck_account_history_operation check (operation in ('BANK_STATEMENT','ACCOUNT_WITHDRAWAL','DEPOSIT_INTO_ACCOUNT','BANK_TRANSFER')),
+  constraint pk_account_history primary key (id)
+);
+
+create table bank (
+  id                            bigserial not null,
+  active                        boolean,
+  removed                       boolean,
+  name                          varchar(255),
+  code                          varchar(255),
+  date_created                  timestamp not null,
+  date_updated                  timestamp not null,
+  constraint pk_bank primary key (id)
+);
+
+create table bank_account (
+  id                            bigserial not null,
+  active                        boolean,
+  removed                       boolean,
+  number                        varchar(255),
+  balance                       decimal(10,2),
+  bank_account_type             varchar(16),
+  bank_agency_id                bigint,
+  date_created                  timestamp not null,
+  date_updated                  timestamp not null,
+  constraint ck_bank_account_bank_account_type check (bank_account_type in ('SAVINGS_ACCOUNT','CHECKING_ACCOUNT')),
+  constraint pk_bank_account primary key (id)
+);
+
+create table bank_agency (
+  id                            bigserial not null,
+  active                        boolean,
+  removed                       boolean,
+  name                          varchar(255),
+  code                          varchar(255),
+  bank_id                       bigint,
+  date_created                  timestamp not null,
+  date_updated                  timestamp not null,
+  constraint pk_bank_agency primary key (id)
+);
+
+create table user_client (
+  id                            bigserial not null,
+  active                        boolean,
+  removed                       boolean,
+  name                          varchar(255),
+  cpf                           varchar(255),
+  address                       varchar(255),
+  date_created                  timestamp not null,
+  date_updated                  timestamp not null,
+  constraint pk_user_client primary key (id)
+);
+
+create table user_client_bank_account (
+  user_client_id                bigint not null,
+  bank_account_id               bigint not null,
+  constraint pk_user_client_bank_account primary key (user_client_id,bank_account_id)
+);
+
+alter table bank_account add constraint fk_bank_account_bank_agency_id foreign key (bank_agency_id) references bank_agency (id) on delete restrict on update restrict;
+create index ix_bank_account_bank_agency_id on bank_account (bank_agency_id);
+
+alter table bank_agency add constraint fk_bank_agency_bank_id foreign key (bank_id) references bank (id) on delete restrict on update restrict;
+create index ix_bank_agency_bank_id on bank_agency (bank_id);
+
+alter table user_client_bank_account add constraint fk_user_client_bank_account_user_client foreign key (user_client_id) references user_client (id) on delete restrict on update restrict;
+create index ix_user_client_bank_account_user_client on user_client_bank_account (user_client_id);
+
+alter table user_client_bank_account add constraint fk_user_client_bank_account_bank_account foreign key (bank_account_id) references bank_account (id) on delete restrict on update restrict;
+create index ix_user_client_bank_account_bank_account on user_client_bank_account (bank_account_id);
+
+
+# --- !Downs
+
+alter table if exists bank_account drop constraint if exists fk_bank_account_bank_agency_id;
+drop index if exists ix_bank_account_bank_agency_id;
+
+alter table if exists bank_agency drop constraint if exists fk_bank_agency_bank_id;
+drop index if exists ix_bank_agency_bank_id;
+
+alter table if exists user_client_bank_account drop constraint if exists fk_user_client_bank_account_user_client;
+drop index if exists ix_user_client_bank_account_user_client;
+
+alter table if exists user_client_bank_account drop constraint if exists fk_user_client_bank_account_bank_account;
+drop index if exists ix_user_client_bank_account_bank_account;
+
+drop table if exists account_history cascade;
+
+drop table if exists bank cascade;
+
+drop table if exists bank_account cascade;
+
+drop table if exists bank_agency cascade;
+
+drop table if exists user_client cascade;
+
+drop table if exists user_client_bank_account cascade;
+
