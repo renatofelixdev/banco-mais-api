@@ -77,7 +77,7 @@ public class BankAccountApiController extends Controller implements ApiControlle
     }
 
     public Result getTypes(){
-        return utils.ok(Json.toJson(BankAccountType.values()));
+        return utils.ok(Json.toJson(BankAccountType.toMap()));
     }
 
     @Override

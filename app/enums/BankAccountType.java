@@ -1,5 +1,8 @@
 package enums;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public enum BankAccountType {
     SAVINGS_ACCOUNT("Conta Poupança"),
     CHECKING_ACCOUNT("Conta Corrente");
@@ -23,5 +26,14 @@ public enum BankAccountType {
             e.printStackTrace();
             return null;
         }
+    }
+
+    public static Map<String, String> toMap(){
+        Map<String, String> map = new HashMap<>();
+
+        for(BankAccountType bat : BankAccountType.values()){
+            map.put(bat.name(), bat.getDescription());
+        }
+        return map;
     }
 }
