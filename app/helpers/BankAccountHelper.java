@@ -17,7 +17,7 @@ public class BankAccountHelper {
     public BankAccount fill(JsonNode json, BankAgency bankAgency) {
         BankAccount bankAccount = new BankAccount();
         bankAccount.setNumber(utils.getValueFromJson(json, "number"));
-        bankAccount.setBalance(BigDecimal.valueOf(0.0));
+        bankAccount.setBalance(BigDecimal.valueOf(utils.getValueDouble(utils.getValueFromJson(json, "balance"))));
         bankAccount.setBankAccountType(BankAccountType.parse(utils.getValueFromJson(json, "bankAccountType")));
         bankAccount.setBankAgency(bankAgency);
         return bankAccount;

@@ -143,4 +143,8 @@ public class Utils {
         Matcher matcher = VALID_EMAIL_ADDRESS_REGEX .matcher(emailStr);
         return matcher.find();
     }
+
+    public void putValue(JsonNode json, String key, String value){
+        ((ObjectNode) json).put(key, value);
+    }
 }
