@@ -81,4 +81,16 @@ public abstract class ApiValidator {
             }
         }
     }
+
+    protected void validBoolean(JsonNode json, String obj){
+        if(json.get(obj) != null && !json.get(obj).asText().isEmpty()) {
+            try {
+                Boolean aBoolean = Boolean.valueOf(json.get(obj).asText());
+            } catch (Exception e) {
+                validators.put(obj, "Falta esta informação!");
+                notification.setStatus(NotificationStatus.ERROR);
+                notification.setValidators(validators);
+            }
+        }
+    }
 }

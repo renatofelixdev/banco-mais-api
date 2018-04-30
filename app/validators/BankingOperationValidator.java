@@ -42,4 +42,21 @@ public class BankingOperationValidator extends ApiValidator{
             notification.setMessage("Há erros no formulário, verifique os dados e tente novamente!");
         return notification;
     }
+
+    public Notification bankTransfer(JsonNode json) {
+        notification.setStatus(NotificationStatus.SUCCESS);
+        validators.clear();
+        super.requiredField(json, "value");
+        super.requiredField(json, "bank");
+        super.requiredField(json, "agency");
+        super.requiredField(json, "account");
+        super.requiredField(json, "sameAccount");
+
+        super.validDecimal(json, "value");
+        super.validBoolean(json, "sameAccount");
+
+        if(notification.getStatus() == NotificationStatus.ERROR)
+            notification.setMessage("Há erros no formulário, verifique os dados e tente novamente!");
+        return notification;
+    }
 }
