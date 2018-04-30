@@ -4,6 +4,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import enums.NotificationStatus;
 import models.Notification;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -48,6 +52,20 @@ public abstract class ApiValidator {
                 notification.setValidators(validators);
             }
 
+        }
+    }
+
+    protected void validDate(JsonNode json, String obj){
+        if(json.get(obj) != null && !json.get(obj).asText().isEmpty()) {
+            DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
+            df.setLenient(false);
+            try {
+                Date dt = df.parse(json.get(obj).asText());
+            } catch (ParseException e) {
+                validators.put(obj, "Data inválida!");
+                notification.setStatus(NotificationStatus.ERROR);
+                notification.setValidators(validators);
+            }
         }
     }
 }

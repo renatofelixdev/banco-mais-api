@@ -28,4 +28,11 @@ public class BankAccountDAO implements ApiDAO {
                 .eq("bankAgency.id", id)
                 .findList();
     }
+
+    public BankAccount byNumber(String account) {
+        return bankAccountFinder.where()
+                .eq("removed", false)
+                .eq("number", account)
+                .findUnique();
+    }
 }

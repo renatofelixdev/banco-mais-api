@@ -12,7 +12,10 @@ import play.mvc.Http;
 import play.mvc.Result;
 
 import javax.inject.Singleton;
+import java.text.DateFormat;
 import java.text.Normalizer;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -146,5 +149,16 @@ public class Utils {
 
     public void putValue(JsonNode json, String key, String value){
         ((ObjectNode) json).put(key, value);
+    }
+
+    public Date getDateFrom(String date){
+        DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
+        df.setLenient(false);
+        try {
+            return df.parse(date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }
