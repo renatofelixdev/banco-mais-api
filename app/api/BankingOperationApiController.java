@@ -62,7 +62,7 @@ public class BankingOperationApiController extends Controller {
     public Result deposit(){
         JsonNode json = request().body().asJson();
 
-        Notification notification = bankingOperationValidator.bankStatement(json);
+        Notification notification = bankingOperationValidator.depositOrWithdrawal(json);
         if (notification.getStatus() == NotificationStatus.ERROR) {
             return utils.badRequest(Json.toJson(notification));
         }
@@ -136,7 +136,38 @@ public class BankingOperationApiController extends Controller {
 
     public Result accountWithDrawal(){
         JsonNode json = request().body().asJson();
-        return null;
+
+        Notification notification = bankingOperationValidator.depositOrWithdrawal(json);
+        if (notification.getStatus() == NotificationStatus.ERROR) {
+            return utils.badRequest(Json.toJson(notification));
+        }
+
+        BankAccount bankAccount = bankAccountDAO.byNumber(utils.getValueFromJson(json, "account"));
+        Result result = validBankAccount(json, bankAccount, "");
+        if(result != null) return result;
+
+        Double value = Double.valueOf(utils.getValueFromJson(json, "value"));
+
+        if(bankAccount.getBalance().doubleValue() < value){
+            return utils.badRequest(Json.toJson(utils.notification(NotificationStatus.WARNING,
+                    "Saldo insuficiente para realizar este saque!")));
+        }
+
+        Double balance = bankAccount.getBalance().doubleValue() - value;
+
+        bankAccount.setBalance(BigDecimal.valueOf(balance));
+        bankAccount.update();
+
+        AccountHistory accountHistory = new AccountHistory();
+        accountHistory.setDate(new Date());
+        accountHistory.setOperation(Operation.ACCOUNT_WITHDRAWAL);
+        accountHistory.setSource(bankAccount);
+        accountHistory.setTarget(null);
+        accountHistory.setValue(BigDecimal.valueOf(value));
+        accountHistory.save();
+
+        return utils.ok(Json.toJson(utils.notification(NotificationStatus.SUCCESS,
+                "Saque realizado com sucesso!")));
     }
 
     private Result validBankAccount(JsonNode json, BankAccount bankAccount, String target){

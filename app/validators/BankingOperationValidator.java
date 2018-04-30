@@ -28,7 +28,7 @@ public class BankingOperationValidator extends ApiValidator{
         return notification;
     }
 
-    public Notification deposit(JsonNode json) {
+    public Notification depositOrWithdrawal(JsonNode json) {
         notification.setStatus(NotificationStatus.SUCCESS);
         validators.clear();
         super.requiredField(json, "value");
