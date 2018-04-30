@@ -4,6 +4,7 @@ import com.avaje.ebean.Model;
 import models.Bank;
 
 import java.util.List;
+import java.util.Optional;
 
 public class BankDAO implements ApiDAO {
     private Model.Finder<Long, Bank> bankFinder = new Model.Finder<>(Bank.class);
@@ -16,7 +17,7 @@ public class BankDAO implements ApiDAO {
     }
 
     @Override
-    public Bank byId(Long id) {
-        return bankFinder.byId(id);
+    public Optional<Bank> byId(Long id) {
+        return Optional.ofNullable(bankFinder.byId(id));
     }
 }

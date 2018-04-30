@@ -16,8 +16,10 @@ import util.Utils;
 import validators.BankingOperationValidator;
 
 import javax.inject.Inject;
+import javax.swing.text.html.Option;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.Optional;
 
 public class BankingOperationApiController extends Controller {
 
@@ -41,7 +43,7 @@ public class BankingOperationApiController extends Controller {
             return utils.badRequest(Json.toJson(notification));
         }
 
-        BankAccount bankAccount = bankAccountDAO.byNumber(utils.getValueFromJson(json, "account"));
+        Optional<BankAccount> bankAccount = bankAccountDAO.byNumber(utils.getValueFromJson(json, "account"));
         Result result = validBankAccount(json, bankAccount, "");
         if(result != null) return result;
 
@@ -51,12 +53,12 @@ public class BankingOperationApiController extends Controller {
         AccountHistory accountHistory = new AccountHistory();
         accountHistory.setDate(new Date());
         accountHistory.setOperation(Operation.BANK_STATEMENT);
-        accountHistory.setSource(bankAccount);
+        accountHistory.setSource(bankAccount.get());
         accountHistory.setTarget(null);
         accountHistory.setValue(null);
         accountHistory.save();
 
-        return utils.ok(Json.toJson(accountHistoryDAO.byBankAccount(bankAccount, start, end)));
+        return utils.ok(Json.toJson(accountHistoryDAO.byBankAccount(bankAccount.get(), start, end)));
     }
 
     public Result deposit(){
@@ -67,9 +69,11 @@ public class BankingOperationApiController extends Controller {
             return utils.badRequest(Json.toJson(notification));
         }
 
-        BankAccount bankAccount = bankAccountDAO.byNumber(utils.getValueFromJson(json, "account"));
-        Result result = validBankAccount(json, bankAccount, "");
+        Optional<BankAccount> bankAccountOptional = bankAccountDAO.byNumber(utils.getValueFromJson(json, "account"));
+        Result result = validBankAccount(json, bankAccountOptional, "");
         if(result != null) return result;
+
+        BankAccount bankAccount = bankAccountOptional.get();
 
         Double value = Double.valueOf(utils.getValueFromJson(json, "value"));
         Double balance = bankAccount.getBalance().doubleValue() + value;
@@ -97,13 +101,17 @@ public class BankingOperationApiController extends Controller {
             return utils.badRequest(Json.toJson(notification));
         }
 
-        BankAccount bankAccountSource = bankAccountDAO.byNumber(utils.getValueFromJson(json, "account"));
-        Result result = validBankAccount(json, bankAccountSource,"");
+        Optional<BankAccount> bankAccountSourceOptional = bankAccountDAO.byNumber(utils.getValueFromJson(json, "account"));
+        Result result = validBankAccount(json, bankAccountSourceOptional,"");
         if(result != null) return result;
 
-        BankAccount bankAccountTarget = bankAccountDAO.byNumber(utils.getValueFromJson(json, "accountTarget"));
-        result = validBankAccount(json, bankAccountTarget, "Target");
+        Optional<BankAccount> bankAccountTargetOptional = bankAccountDAO.byNumber(utils.getValueFromJson(json, "accountTarget"));
+        result = validBankAccount(json, bankAccountTargetOptional, "Target");
         if(result != null) return result;
+
+        BankAccount bankAccountSource = bankAccountSourceOptional.get();
+        BankAccount bankAccountTarget = bankAccountTargetOptional.get();
+
 
         Double value = Double.valueOf(utils.getValueFromJson(json, "value"));
 
@@ -142,9 +150,11 @@ public class BankingOperationApiController extends Controller {
             return utils.badRequest(Json.toJson(notification));
         }
 
-        BankAccount bankAccount = bankAccountDAO.byNumber(utils.getValueFromJson(json, "account"));
-        Result result = validBankAccount(json, bankAccount, "");
+        Optional<BankAccount> bankAccountOptional = bankAccountDAO.byNumber(utils.getValueFromJson(json, "account"));
+        Result result = validBankAccount(json, bankAccountOptional, "");
         if(result != null) return result;
+
+        BankAccount bankAccount = bankAccountOptional.get();
 
         Double value = Double.valueOf(utils.getValueFromJson(json, "value"));
 
@@ -170,17 +180,17 @@ public class BankingOperationApiController extends Controller {
                 "Saque realizado com sucesso!")));
     }
 
-    private Result validBankAccount(JsonNode json, BankAccount bankAccount, String target){
+    private Result validBankAccount(JsonNode json, Optional<BankAccount> bankAccount, String target){
 
         Result result = utils.valid(bankAccount, NameEntity.BANK_ACCOUNT);
         if (result != null) return result;
 
-        if(!bankAccount.getBankAgency().getCode().equals(utils.getValueFromJson(json, "agency"+target))){
+        if(!bankAccount.get().getBankAgency().getCode().equals(utils.getValueFromJson(json, "agency"+target))){
             return utils.badRequest(Json.toJson(utils.notification(NotificationStatus.WARNING,
                     "Agência não compatível com esta conta!")));
         }
 
-        if(!bankAccount.getBankAgency().getBank().getCode().equals(utils.getValueFromJson(json, "bank"+target))){
+        if(!bankAccount.get().getBankAgency().getBank().getCode().equals(utils.getValueFromJson(json, "bank"+target))){
             return utils.badRequest(Json.toJson(utils.notification(NotificationStatus.WARNING,
                     "Banco não compatível com esta agência!")));
         }

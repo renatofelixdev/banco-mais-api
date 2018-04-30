@@ -7,6 +7,7 @@ import models.BankAccount;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import static com.avaje.ebean.Expr.eq;
 
@@ -22,8 +23,8 @@ public class AccountHistoryDAO implements ApiDAO {
     }
 
     @Override
-    public AccountHistory byId(Long id) {
-        return accountHistoryFinder.byId(id);
+    public Optional<AccountHistory> byId(Long id) {
+        return Optional.ofNullable(accountHistoryFinder.byId(id));
     }
 
     public List<AccountHistory> byBankAccount(BankAccount bankAccount, Date start, Date end){

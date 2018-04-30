@@ -16,6 +16,7 @@ import util.Utils;
 import validators.BankAgencyValidator;
 
 import javax.inject.Inject;
+import java.util.Optional;
 
 public class BankAgencyApiController extends Controller implements ApiController {
 
@@ -41,7 +42,7 @@ public class BankAgencyApiController extends Controller implements ApiController
 
 
     public Result byBank(Long id) {
-        Bank bank = bankDAO.byId(id);
+        Optional<Bank> bank = bankDAO.byId(id);
 
         Result result = utils.valid(bank, NameEntity.BANK);
         if (result != null) return result;
@@ -51,7 +52,7 @@ public class BankAgencyApiController extends Controller implements ApiController
 
     @Override
     public Result byId(Long id) {
-        BankAgency bankAgency = bankAgencyDAO.byId(id);
+        Optional<BankAgency> bankAgency = bankAgencyDAO.byId(id);
 
         Result result = utils.valid(bankAgency, NameEntity.BANK_AGENCY);
         if (result != null) return result;
@@ -68,12 +69,12 @@ public class BankAgencyApiController extends Controller implements ApiController
             return utils.badRequest(Json.toJson(notification));
         }
 
-        Bank bank = bankDAO.byId(Long.valueOf(utils.getValueFromJson(json, "bank")));
+        Optional<Bank> bank = bankDAO.byId(Long.valueOf(utils.getValueFromJson(json, "bank")));
 
         Result result = utils.valid(bank, NameEntity.BANK);
         if (result != null) return result;
 
-        BankAgency bankAgency = bankAgencyHelper.fill(json, bank);
+        BankAgency bankAgency = bankAgencyHelper.fill(json, bank.get());
         bankAgency.save();
 
         return utils.ok(Json.toJson(utils.notification(NotificationStatus.SUCCESS,
@@ -89,17 +90,18 @@ public class BankAgencyApiController extends Controller implements ApiController
             return utils.badRequest(Json.toJson(notification));
         }
 
-        Bank bank = bankDAO.byId(Long.valueOf(utils.getValueFromJson(json, "bank")));
+        Optional<Bank> bank = bankDAO.byId(Long.valueOf(utils.getValueFromJson(json, "bank")));
 
         Result result = utils.valid(bank, NameEntity.BANK);
         if (result != null) return result;
 
-        BankAgency bankAgency = bankAgencyDAO.byId(id);
+        Optional<BankAgency> bankAgencyOptional = bankAgencyDAO.byId(id);
 
-        result = utils.valid(bankAgency, NameEntity.BANK_AGENCY);
+        result = utils.valid(bankAgencyOptional, NameEntity.BANK_AGENCY);
         if (result != null) return result;
 
-        bankAgency = bankAgencyHelper.fill(bankAgency, json, bank);
+        BankAgency bankAgency = bankAgencyOptional.get();
+        bankAgency = bankAgencyHelper.fill(bankAgency, json, bank.get());
         bankAgency.update();
 
         return utils.ok(Json.toJson(utils.notification(NotificationStatus.SUCCESS,
@@ -108,11 +110,12 @@ public class BankAgencyApiController extends Controller implements ApiController
 
     @Override
     public Result delete(Long id) {
-        BankAgency bankAgency = bankAgencyDAO.byId(id);
+        Optional<BankAgency> bankAgencyOptional = bankAgencyDAO.byId(id);
 
-        Result result = utils.valid(bankAgency, NameEntity.BANK_AGENCY);
+        Result result = utils.valid(bankAgencyOptional, NameEntity.BANK_AGENCY);
         if (result != null) return result;
 
+        BankAgency bankAgency = bankAgencyOptional.get();
         bankAgency.setRemoved(true);
         bankAgency.update();
 
@@ -122,11 +125,12 @@ public class BankAgencyApiController extends Controller implements ApiController
 
     @Override
     public Result alterStatus(Long id) {
-        BankAgency bankAgency = bankAgencyDAO.byId(id);
+        Optional<BankAgency> bankAgencyOptional = bankAgencyDAO.byId(id);
 
-        Result result = utils.valid(bankAgency, NameEntity.BANK_AGENCY);
+        Result result = utils.valid(bankAgencyOptional, NameEntity.BANK_AGENCY);
         if (result != null) return result;
 
+        BankAgency bankAgency = bankAgencyOptional.get();
         bankAgency.setActive(!bankAgency.isActive());
         bankAgency.update();
 

@@ -10,6 +10,8 @@ create table account_history (
   date                          date,
   operation                     varchar(20),
   value                         decimal(10,2),
+  source_id                     bigint,
+  target_id                     bigint,
   date_created                  timestamp not null,
   date_updated                  timestamp not null,
   constraint ck_account_history_operation check (operation in ('BANK_STATEMENT','ACCOUNT_WITHDRAWAL','DEPOSIT_INTO_ACCOUNT','BANK_TRANSFER')),
@@ -78,6 +80,12 @@ create table user_master (
   constraint pk_user_master primary key (id)
 );
 
+alter table account_history add constraint fk_account_history_source_id foreign key (source_id) references bank_account (id) on delete restrict on update restrict;
+create index ix_account_history_source_id on account_history (source_id);
+
+alter table account_history add constraint fk_account_history_target_id foreign key (target_id) references bank_account (id) on delete restrict on update restrict;
+create index ix_account_history_target_id on account_history (target_id);
+
 alter table bank_account add constraint fk_bank_account_bank_agency_id foreign key (bank_agency_id) references bank_agency (id) on delete restrict on update restrict;
 create index ix_bank_account_bank_agency_id on bank_account (bank_agency_id);
 
@@ -88,6 +96,12 @@ create index ix_bank_agency_bank_id on bank_agency (bank_id);
 
 
 # --- !Downs
+
+alter table if exists account_history drop constraint if exists fk_account_history_source_id;
+drop index if exists ix_account_history_source_id;
+
+alter table if exists account_history drop constraint if exists fk_account_history_target_id;
+drop index if exists ix_account_history_target_id;
 
 alter table if exists bank_account drop constraint if exists fk_bank_account_bank_agency_id;
 drop index if exists ix_bank_account_bank_agency_id;

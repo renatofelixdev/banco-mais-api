@@ -14,6 +14,7 @@ import util.Utils;
 import validators.UserClientValidator;
 
 import javax.inject.Inject;
+import java.util.Optional;
 
 public class UserClientApiController extends Controller implements ApiController {
 
@@ -36,12 +37,12 @@ public class UserClientApiController extends Controller implements ApiController
 
     @Override
     public Result byId(Long id) {
-        UserClient userClient = userClientDAO.byId(id);
+        Optional<UserClient> userClient = userClientDAO.byId(id);
 
         Result result = utils.valid(userClient, NameEntity.USER_CLIENT);
         if (result != null) return result;
 
-        return utils.ok(Json.toJson(userClient));
+        return utils.ok(Json.toJson(userClient.get()));
     }
 
     @Override
@@ -54,6 +55,7 @@ public class UserClientApiController extends Controller implements ApiController
         }
 
         UserClient userClient = verifyUser(json);
+        userClient.save();
 
         return utils.ok(Json.toJson(utils.notification(NotificationStatus.SUCCESS,
                 NameEntity.USER_CLIENT+ " " + userClient.getName() +" salvo com sucesso!")));
@@ -68,16 +70,22 @@ public class UserClientApiController extends Controller implements ApiController
             return utils.badRequest(Json.toJson(notification));
         }
 
-        UserClient userClient = userClientDAO.byId(id);
+        Optional<UserClient> userClientOptional = userClientDAO.byId(id);
 
-        Result result = utils.valid(userClient, NameEntity.USER_CLIENT);
+        Result result = utils.valid(userClientOptional, NameEntity.USER_CLIENT);
         if (result != null) return result;
 
-        UserClient user = userClientDAO.byCpf(utils.getValueFromJson(json, "cpf"));
-        if(user != null && !user.getId().equals(userClient.getId()))
-            return utils.badRequest(Json.toJson(utils.notification(NotificationStatus.WARNING,
-                    "Este CPF já está cadastrado!")));
+        Optional<UserClient> user = userClientDAO.byCpf(utils.getValueFromJson(json, "cpf"));
+        UserClient finalUserClient = userClientOptional.get();
+        user.ifPresent((u) -> {
+            if(!u.getId().equals(finalUserClient.getId())){
+                utils.badRequest(Json.toJson(utils.notification(NotificationStatus.WARNING,
+                        "Este CPF já está cadastrado!")));
+            }
+        });
+        //if(user != null && !user.getId().equals(userClient.getId()))
 
+        UserClient userClient = userClientOptional.get();
         userClient = userClientHelper.fill(userClient, json);
 
         userClient.update();
@@ -88,11 +96,12 @@ public class UserClientApiController extends Controller implements ApiController
 
     @Override
     public Result delete(Long id) {
-        UserClient userClient = userClientDAO.byId(id);
+        Optional<UserClient> userClientOptional = userClientDAO.byId(id);
 
-        Result result = utils.valid(userClient, NameEntity.USER_CLIENT);
+        Result result = utils.valid(userClientOptional, NameEntity.USER_CLIENT);
         if (result != null) return result;
 
+        UserClient userClient = userClientOptional.get();
         userClient.setRemoved(true);
         userClient.update();
 
@@ -102,11 +111,12 @@ public class UserClientApiController extends Controller implements ApiController
 
     @Override
     public Result alterStatus(Long id) {
-        UserClient userClient = userClientDAO.byId(id);
+        Optional<UserClient> userClientOptional = userClientDAO.byId(id);
 
-        Result result = utils.valid(userClient, NameEntity.USER_CLIENT);
+        Result result = utils.valid(userClientOptional, NameEntity.USER_CLIENT);
         if (result != null) return result;
 
+        UserClient userClient = userClientOptional.get();
         userClient.setActive(!userClient.isActive());
         userClient.update();
 
@@ -115,14 +125,24 @@ public class UserClientApiController extends Controller implements ApiController
     }
 
     public UserClient verifyUser(JsonNode json){
-        UserClient userClient = userClientDAO.byCpf(utils.getValueFromJson(json, "cpf"));
-        if(userClient == null){
+        Optional<UserClient> userClient = userClientDAO.byCpf(utils.getValueFromJson(json, "cpf"));
+
+        return userClient
+                .map(u -> {
+                        userClientHelper.fill(u,json);
+                        return u;
+                })
+                .orElseGet(() -> {
+                        return userClientHelper.fill(json);
+                });
+
+        /*if(userClient == null){
             userClient = userClientHelper.fill(json);
             userClient.save();
         }else{
             userClient = userClientHelper.fill(userClient, json);
             userClient.update();
         }
-        return userClient;
+        return userClient;*/
     }
 }

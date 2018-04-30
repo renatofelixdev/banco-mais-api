@@ -37,7 +37,7 @@ public abstract class ApiValidator {
 
     protected void requiredField(JsonNode json, String obj){
         if(json.get(obj) == null || json.get(obj).asText().isEmpty()){
-            validators.put(obj, "Digite o nome do (a) "+ ENTITY);
+            validators.put(obj, ENTITY + " é obrigatório!");
             notification.setStatus(NotificationStatus.ERROR);
             notification.setValidators(validators);
         }

@@ -14,6 +14,7 @@ import util.Utils;
 import validators.BankValidator;
 
 import javax.inject.Inject;
+import java.util.Optional;
 
 public class BankApiController extends Controller implements ApiController {
 
@@ -36,7 +37,7 @@ public class BankApiController extends Controller implements ApiController {
 
     @Override
     public Result byId(Long id) {
-        Bank bank = bankDAO.byId(id);
+        Optional<Bank> bank = bankDAO.byId(id);
 
         Result result = utils.valid(bank, NameEntity.BANK);
         if(result != null) return result;
@@ -69,11 +70,12 @@ public class BankApiController extends Controller implements ApiController {
             return utils.badRequest(Json.toJson(notification));
         }
 
-        Bank bank = bankDAO.byId(id);
+        Optional<Bank> bankOptional = bankDAO.byId(id);
 
-        Result result = utils.valid(bank, NameEntity.BANK);
+        Result result = utils.valid(bankOptional, NameEntity.BANK);
         if(result != null) return result;
 
+        Bank bank = bankOptional.get();
         bank = bankHelper.fill(bank, json);
         bank.update();
 
@@ -83,11 +85,12 @@ public class BankApiController extends Controller implements ApiController {
 
     @Override
     public Result delete(Long id) {
-        Bank bank = bankDAO.byId(id);
+        Optional<Bank> bankOptional = bankDAO.byId(id);
 
-        Result result = utils.valid(bank, NameEntity.BANK);
+        Result result = utils.valid(bankOptional, NameEntity.BANK);
         if(result != null) return result;
 
+        Bank bank = bankOptional.get();
         bank.setRemoved(true);
         bank.update();
 
@@ -97,11 +100,12 @@ public class BankApiController extends Controller implements ApiController {
 
     @Override
     public Result alterStatus(Long id) {
-        Bank bank = bankDAO.byId(id);
+        Optional<Bank> bankOptional = bankDAO.byId(id);
 
-        Result result = utils.valid(bank, NameEntity.BANK);
+        Result result = utils.valid(bankOptional, NameEntity.BANK);
         if(result != null) return result;
 
+        Bank bank = bankOptional.get();
         bank.setActive(!bank.isActive());
         bank.update();
 

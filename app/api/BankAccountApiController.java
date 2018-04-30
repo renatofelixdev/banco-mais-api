@@ -22,6 +22,7 @@ import validators.BankAccountValidator;
 import validators.UserClientValidator;
 
 import javax.inject.Inject;
+import java.util.Optional;
 
 public class BankAccountApiController extends Controller implements ApiController {
 
@@ -59,18 +60,18 @@ public class BankAccountApiController extends Controller implements ApiControlle
 
     public Result byUserClient(Long id){
 
-        UserClient userClient = userClientDAO.byId(id);
+        Optional<UserClient> userClient = userClientDAO.byId(id);
 
         Result result = utils.valid(userClient, NameEntity.USER_CLIENT);
         if (result != null) return result;
 
-        return utils.ok(Json.toJson(userClient.getBankAccountList()));
+        return utils.ok(Json.toJson(userClient.get().getBankAccountList()));
 
     }
 
     public Result byBankAgency(Long id){
 
-        BankAgency bankAgency = bankAgencyDAO.byId(id);
+        Optional<BankAgency> bankAgency = bankAgencyDAO.byId(id);
 
         Result result = utils.valid(bankAgency, NameEntity.BANK_AGENCY);
         if (result != null) return result;
@@ -85,7 +86,7 @@ public class BankAccountApiController extends Controller implements ApiControlle
 
     @Override
     public Result byId(Long id) {
-        BankAccount bankAccount = bankAccountDAO.byId(id);
+        Optional<BankAccount> bankAccount = bankAccountDAO.byId(id);
 
         Result result = utils.valid(bankAccount, NameEntity.BANK_ACCOUNT);
         if (result != null) return result;
@@ -112,12 +113,12 @@ public class BankAccountApiController extends Controller implements ApiControlle
             return utils.badRequest(Json.toJson(notification));
         }
 
-        BankAgency bankAgency = bankAgencyDAO.byId(Long.valueOf(utils.getValueFromJson(json, "bankAgency")));
+        Optional<BankAgency> bankAgency = bankAgencyDAO.byId(Long.valueOf(utils.getValueFromJson(json, "bankAgency")));
 
         Result result = utils.valid(bankAgency, NameEntity.BANK_AGENCY);
         if (result != null) return result;
 
-        BankAccount bankAccount = bankAccountHelper.fill(json, bankAgency, userClient);
+        BankAccount bankAccount = bankAccountHelper.fill(json, bankAgency.get(), userClient);
         bankAccount.save();
 
         return utils.ok(Json.toJson(utils.notification(NotificationStatus.SUCCESS,
@@ -133,16 +134,17 @@ public class BankAccountApiController extends Controller implements ApiControlle
             return utils.badRequest(Json.toJson(notification));
         }
 
-        BankAgency bankAgency = bankAgencyDAO.byId(Long.valueOf(utils.getValueFromJson(json, "bankAgency")));
+        Optional<BankAgency> bankAgency = bankAgencyDAO.byId(Long.valueOf(utils.getValueFromJson(json, "bankAgency")));
 
         Result result = utils.valid(bankAgency, NameEntity.BANK_AGENCY);
         if (result != null) return result;
 
-        BankAccount bankAccount = bankAccountDAO.byId(id);
-        result = utils.valid(bankAccount, NameEntity.BANK_ACCOUNT);
+        Optional<BankAccount> bankAccountOptional = bankAccountDAO.byId(id);
+        result = utils.valid(bankAccountOptional, NameEntity.BANK_ACCOUNT);
         if (result != null) return result;
 
-        bankAccount = bankAccountHelper.fill(bankAccount, json, bankAgency);
+        BankAccount bankAccount = bankAccountOptional.get();
+        bankAccount = bankAccountHelper.fill(bankAccount, json, bankAgency.get());
         bankAccount.update();
 
         return utils.ok(Json.toJson(utils.notification(NotificationStatus.SUCCESS,
@@ -151,10 +153,11 @@ public class BankAccountApiController extends Controller implements ApiControlle
 
     @Override
     public Result delete(Long id) {
-        BankAccount bankAccount = bankAccountDAO.byId(id);
-        Result result = utils.valid(bankAccount, NameEntity.BANK_ACCOUNT);
+        Optional<BankAccount> bankAccountOptional = bankAccountDAO.byId(id);
+        Result result = utils.valid(bankAccountOptional, NameEntity.BANK_ACCOUNT);
         if (result != null) return result;
 
+        BankAccount bankAccount = bankAccountOptional.get();
         bankAccount.setRemoved(true);
         bankAccount.update();
 
@@ -164,10 +167,11 @@ public class BankAccountApiController extends Controller implements ApiControlle
 
     @Override
     public Result alterStatus(Long id) {
-        BankAccount bankAccount = bankAccountDAO.byId(id);
-        Result result = utils.valid(bankAccount, NameEntity.BANK_ACCOUNT);
+        Optional<BankAccount> bankAccountOptional = bankAccountDAO.byId(id);
+        Result result = utils.valid(bankAccountOptional, NameEntity.BANK_ACCOUNT);
         if (result != null) return result;
 
+        BankAccount bankAccount = bankAccountOptional.get();
         bankAccount.setActive(!bankAccount.isActive());
         bankAccount.update();
 

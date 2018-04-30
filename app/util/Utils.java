@@ -109,12 +109,13 @@ public class Utils {
         }
     }
 
-    public Result valid(Object object, String entity){
-        if(object == null){
+    public Result valid(Optional<?> object, String entity){
+        if(object.isPresent()){
+            return null;
+        }else{
             return badRequest(Json.toJson(notification(NotificationStatus.WARNING,
                     entity + " não encontrado (a)!")));
         }
-        return null;
     }
 
     public Object mapGetValue(Map<String, Object> map, String key){

@@ -4,6 +4,7 @@ import com.avaje.ebean.Model;
 import models.UserClient;
 
 import java.util.List;
+import java.util.Optional;
 
 public class UserClientDAO implements ApiDAO {
     private Model.Finder<Long, UserClient> userClientFinder = new Model.Finder<>(UserClient.class);
@@ -16,14 +17,14 @@ public class UserClientDAO implements ApiDAO {
     }
 
     @Override
-    public UserClient byId(Long id) {
-        return userClientFinder.byId(id);
+    public Optional<UserClient> byId(Long id) {
+        return Optional.ofNullable(userClientFinder.byId(id));
     }
 
-    public UserClient byCpf(String cpf) {
-        return userClientFinder.where()
+    public Optional<UserClient> byCpf(String cpf) {
+        return Optional.ofNullable(userClientFinder.where()
                 .eq("removed", false)
                 .eq("cpf", cpf)
-                .findUnique();
+                .findUnique());
     }
 }

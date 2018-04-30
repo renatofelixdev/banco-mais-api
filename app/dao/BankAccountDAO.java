@@ -5,6 +5,7 @@ import models.BankAccount;
 
 import javax.management.MalformedObjectNameException;
 import java.util.List;
+import java.util.Optional;
 
 public class BankAccountDAO implements ApiDAO {
 
@@ -18,8 +19,8 @@ public class BankAccountDAO implements ApiDAO {
     }
 
     @Override
-    public BankAccount byId(Long id) {
-        return bankAccountFinder.byId(id);
+    public Optional<BankAccount> byId(Long id) {
+        return Optional.ofNullable(bankAccountFinder.byId(id));
     }
 
     public List<BankAccount> allByAgency(Long id) {
@@ -29,10 +30,10 @@ public class BankAccountDAO implements ApiDAO {
                 .findList();
     }
 
-    public BankAccount byNumber(String account) {
-        return bankAccountFinder.where()
+    public Optional<BankAccount> byNumber(String account) {
+        return Optional.ofNullable(bankAccountFinder.where()
                 .eq("removed", false)
                 .eq("number", account)
-                .findUnique();
+                .findUnique());
     }
 }

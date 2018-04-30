@@ -1,7 +1,9 @@
 package enums;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public enum BankAccountType {
     SAVINGS_ACCOUNT("Conta Poupança"),
@@ -28,12 +30,8 @@ public enum BankAccountType {
         }
     }
 
-    public static Map<String, String> toMap(){
-        Map<String, String> map = new HashMap<>();
-
-        for(BankAccountType bat : BankAccountType.values()){
-            map.put(bat.name(), bat.getDescription());
-        }
-        return map;
+    //JAVA 8 STREAM
+    public static Map<BankAccountType, String> toMap(){
+        return Arrays.stream(BankAccountType.values()).collect(Collectors.toMap(d -> d, BankAccountType::getDescription));
     }
 }
