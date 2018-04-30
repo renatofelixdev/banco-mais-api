@@ -54,6 +54,12 @@ public class UserClientApiController extends Controller implements ApiController
             return utils.badRequest(Json.toJson(notification));
         }
 
+        Optional<UserClient> user = userClientDAO.byCpf(utils.getValueFromJson(json, "cpf"));
+        if(user.isPresent()){
+            return utils.badRequest(Json.toJson(utils.notification(NotificationStatus.WARNING,
+                    "Este CPF já está cadastrado!")));
+        }
+
         UserClient userClient = verifyUser(json);
         userClient.save();
 
@@ -77,13 +83,12 @@ public class UserClientApiController extends Controller implements ApiController
 
         Optional<UserClient> user = userClientDAO.byCpf(utils.getValueFromJson(json, "cpf"));
         UserClient finalUserClient = userClientOptional.get();
-        user.ifPresent((u) -> {
-            if(!u.getId().equals(finalUserClient.getId())){
-                utils.badRequest(Json.toJson(utils.notification(NotificationStatus.WARNING,
+        if(user.isPresent()){
+            if(!user.get().getId().equals(finalUserClient.getId())){
+                return utils.badRequest(Json.toJson(utils.notification(NotificationStatus.WARNING,
                         "Este CPF já está cadastrado!")));
             }
-        });
-        //if(user != null && !user.getId().equals(userClient.getId()))
+        }
 
         UserClient userClient = userClientOptional.get();
         userClient = userClientHelper.fill(userClient, json);
@@ -126,7 +131,7 @@ public class UserClientApiController extends Controller implements ApiController
 
     public UserClient verifyUser(JsonNode json){
         Optional<UserClient> userClient = userClientDAO.byCpf(utils.getValueFromJson(json, "cpf"));
-
+        //JAVA 8 OPTIONAL E LAMBDAS
         return userClient
                 .map(u -> {
                         userClientHelper.fill(u,json);
