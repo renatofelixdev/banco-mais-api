@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import enums.NotificationStatus;
 import models.Notification;
 
+import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -63,6 +64,18 @@ public abstract class ApiValidator {
                 Date dt = df.parse(json.get(obj).asText());
             } catch (ParseException e) {
                 validators.put(obj, "Data inválida!");
+                notification.setStatus(NotificationStatus.ERROR);
+                notification.setValidators(validators);
+            }
+        }
+    }
+
+    protected void validDecimal(JsonNode json, String obj){
+        if(json.get(obj) != null && !json.get(obj).asText().isEmpty()) {
+            try {
+                BigDecimal decimal = BigDecimal.valueOf(Double.valueOf(json.get(obj).asText()));
+            } catch (Exception e) {
+                validators.put(obj, "Valor inválido!");
                 notification.setStatus(NotificationStatus.ERROR);
                 notification.setValidators(validators);
             }

@@ -16,6 +16,7 @@ import util.Utils;
 import validators.BankingOperationValidator;
 
 import javax.inject.Inject;
+import java.math.BigDecimal;
 import java.util.Date;
 
 public class BankingOperationApiController extends Controller {
@@ -41,19 +42,8 @@ public class BankingOperationApiController extends Controller {
         }
 
         BankAccount bankAccount = bankAccountDAO.byNumber(utils.getValueFromJson(json, "account"));
-
-        Result result = utils.valid(bankAccount, NameEntity.BANK_ACCOUNT);
-        if (result != null) return result;
-
-        if(!bankAccount.getBankAgency().getCode().equals(utils.getValueFromJson(json, "agency"))){
-            return utils.badRequest(Json.toJson(utils.notification(NotificationStatus.WARNING,
-                    "Agência não compatível com esta conta!")));
-        }
-
-        if(!bankAccount.getBankAgency().getBank().getCode().equals(utils.getValueFromJson(json, "bank"))){
-            return utils.badRequest(Json.toJson(utils.notification(NotificationStatus.WARNING,
-                    "Banco não compatível com esta agência!")));
-        }
+        Result result = validBankAccount(json, bankAccount);
+        if(result != null) return result;
 
         Date start = utils.getDateFrom(utils.getValueFromJson(json, "startDate"));
         Date end = utils.getDateFrom(utils.getValueFromJson(json, "endDate"));
@@ -71,7 +61,31 @@ public class BankingOperationApiController extends Controller {
 
     public Result deposit(){
         JsonNode json = request().body().asJson();
-        return null;
+
+        Notification notification = bankingOperationValidator.bankStatement(json);
+        if (notification.getStatus() == NotificationStatus.ERROR) {
+            return utils.badRequest(Json.toJson(notification));
+        }
+
+        BankAccount bankAccount = bankAccountDAO.byNumber(utils.getValueFromJson(json, "account"));
+        Result result = validBankAccount(json, bankAccount);
+        if(result != null) return result;
+
+        Double value = Double.valueOf(utils.getValueFromJson(json, "value"));
+        Double balance = bankAccount.getBalance().doubleValue() + value;
+
+        bankAccount.setBalance(BigDecimal.valueOf(balance));
+
+        AccountHistory accountHistory = new AccountHistory();
+        accountHistory.setDate(new Date());
+        accountHistory.setOperation(Operation.BANK_STATEMENT);
+        accountHistory.setSource(bankAccount);
+        accountHistory.setTarget(bankAccount);
+        accountHistory.setValue(BigDecimal.valueOf(value));
+        accountHistory.save();
+
+        return utils.ok(Json.toJson(utils.notification(NotificationStatus.SUCCESS,
+                "Depósito realizado com sucesso!")));
     }
 
     public Result bankTransfer(){
@@ -81,6 +95,24 @@ public class BankingOperationApiController extends Controller {
 
     public Result accountWithDrawal(){
         JsonNode json = request().body().asJson();
+        return null;
+    }
+
+    private Result validBankAccount(JsonNode json, BankAccount bankAccount){
+
+        Result result = utils.valid(bankAccount, NameEntity.BANK_ACCOUNT);
+        if (result != null) return result;
+
+        if(!bankAccount.getBankAgency().getCode().equals(utils.getValueFromJson(json, "agency"))){
+            return utils.badRequest(Json.toJson(utils.notification(NotificationStatus.WARNING,
+                    "Agência não compatível com esta conta!")));
+        }
+
+        if(!bankAccount.getBankAgency().getBank().getCode().equals(utils.getValueFromJson(json, "bank"))){
+            return utils.badRequest(Json.toJson(utils.notification(NotificationStatus.WARNING,
+                    "Banco não compatível com esta agência!")));
+        }
+
         return null;
     }
 }

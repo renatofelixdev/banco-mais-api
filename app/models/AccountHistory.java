@@ -20,8 +20,10 @@ public class AccountHistory extends ModelMaster {
     @Column(precision=10, scale=2)
     private BigDecimal value;
 
+    @ManyToOne
     private BankAccount source;
 
+    @ManyToOne
     private BankAccount target;
 
     public Date getDate() {

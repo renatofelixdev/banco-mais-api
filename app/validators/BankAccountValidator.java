@@ -14,6 +14,7 @@ public class BankAccountValidator extends  ApiValidator{
     protected void validators(JsonNode json) {
         super.requiredField(json, "number");
         super.requiredField(json, "balance");
+        super.validDecimal(json, "balance");
         super.requiredField(json, "userClient");
         super.validInt(json, "userClient", NameEntity.USER_CLIENT);
         super.requiredField(json, "bankAccountType");
