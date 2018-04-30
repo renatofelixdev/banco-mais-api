@@ -8,11 +8,11 @@ Projeto desenvolvido com [Play Framework!](https://www.playframework.com/)
 
 ## Recomendações
 
-Banco de Dados: [Postgres](https://www.postgresql.org/)
-~~Caso deseje utilizar outro banco de dados altere o driver no projeto no arquivo: build.sbt~~
+Banco de Dados: [Postgres](https://www.postgresql.org/)<br/>
+_Caso deseje utilizar outro banco de dados altere o driver no projeto no arquivo: build.sbt_
 
-Ambiente de Desenvolvimento: [Intellij IDEA](https://www.jetbrains.com/idea/)
-~~É possível executar o projeto também, com [sbt](http://www.scala-sbt.org/)~~
+Ambiente de Desenvolvimento: [Intellij IDEA](https://www.jetbrains.com/idea/)<br/>
+_Também é possível executar o projeto, com [sbt](http://www.scala-sbt.org/)_
 
 ```
 sbt run
