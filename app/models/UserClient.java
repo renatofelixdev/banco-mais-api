@@ -9,6 +9,11 @@ public class UserClient extends ModelMaster {
     private String cpf;
     private String address;
 
+    private String password;
+
+    @Transient
+    private String token;
+
     @OneToMany(mappedBy = "userClient")
     private List<BankAccount> bankAccountList;
 
@@ -42,5 +47,21 @@ public class UserClient extends ModelMaster {
 
     public void setBankAccountList(List<BankAccount> bankAccountList) {
         this.bankAccountList = bankAccountList;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
     }
 }

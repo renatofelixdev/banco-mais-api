@@ -1,11 +1,15 @@
 package models;
 
 import javax.persistence.Entity;
+import javax.persistence.Transient;
 
 @Entity
 public class UserMaster extends ModelMaster {
     private String login;
     private String password;
+
+    @Transient
+    private String token;
 
     public String getLogin() {
         return login;
@@ -21,5 +25,13 @@ public class UserMaster extends ModelMaster {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
     }
 }
