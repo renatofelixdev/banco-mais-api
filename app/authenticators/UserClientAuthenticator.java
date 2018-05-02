@@ -7,6 +7,7 @@ import play.libs.Json;
 import play.mvc.Http;
 import play.mvc.Result;
 import play.mvc.Security;
+import util.GeneralAttr;
 import util.Utils;
 
 import javax.inject.Inject;
@@ -24,7 +25,11 @@ public class UserClientAuthenticator extends Security.Authenticator {
     @Override
     public String getUsername(Http.Context ctx) {
         String token = "";
-        token = ctx.request().getHeader("Authorization").toString();
+        try {
+            token = ctx.request().getHeader("Authorization").toString();
+        }catch (Exception e){
+            return null;
+        }
 
         Optional<UserClient> userClientOptional = userClientDAO.withToken(token);
 
@@ -35,7 +40,7 @@ public class UserClientAuthenticator extends Security.Authenticator {
             Duration duration = Duration.between(userClient.getTokenAccess().getDateCreated().toInstant(), timeNow);
 
             //24hrs RENOVAÇÃO DO TOKEN
-            if (duration.getSeconds() > 86400) {
+            if (duration.getSeconds() > GeneralAttr.EXPIRATION_TIME) {
                 ctx.args.put("tokenExpired", true);
                 return null;
             }
@@ -50,6 +55,7 @@ public class UserClientAuthenticator extends Security.Authenticator {
     @Override
     public Result onUnauthorized(Http.Context ctx) {
         if(utils.mapGetValue(ctx.args, "tokenExpired") != null && (boolean)utils.mapGetValue(ctx.args, "tokenExpired")){
+            ctx.args.put("tokenExpired", false);
             return utils.badRequest(Json.toJson(utils.notification(NotificationStatus.WARNING,
                     "Sessão expirada!")));
         }

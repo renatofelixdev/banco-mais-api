@@ -24,6 +24,7 @@ import play.mvc.Controller;
 import play.mvc.Http;
 import play.mvc.Result;
 import play.mvc.Security;
+import util.GeneralAttr;
 import util.NameEntity;
 import util.OAuthAttr;
 import util.Utils;
@@ -214,7 +215,7 @@ public class UserClientApiController extends Controller implements ApiController
                     Duration duration = Duration.between(userClient.getTokenAccess().getDateCreated().toInstant(), timeNow);
 
                     //24hrs RENOVAÇÃO DO TOKEN
-                    if (duration.getSeconds() > 86400) {
+                    if (duration.getSeconds() > GeneralAttr.EXPIRATION_TIME) {
                         TokenAccess tokenAccess = userClient.getTokenAccess();
 
                         TokenAccess newToken = new TokenAccess(token);
