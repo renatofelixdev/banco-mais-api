@@ -1,5 +1,7 @@
 package models;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import javax.persistence.*;
 import java.util.List;
 
@@ -9,12 +11,14 @@ public class UserClient extends ModelMaster {
     private String cpf;
     private String address;
 
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
-    @Transient
-    private String token;
+    @OneToOne
+    private TokenAccess tokenAccess;
 
     @OneToMany(mappedBy = "userClient")
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private List<BankAccount> bankAccountList;
 
     public String getName() {
@@ -57,11 +61,11 @@ public class UserClient extends ModelMaster {
         this.password = password;
     }
 
-    public String getToken() {
-        return token;
+    public TokenAccess getTokenAccess() {
+        return tokenAccess;
     }
 
-    public void setToken(String token) {
-        this.token = token;
+    public void setTokenAccess(TokenAccess tokenAccess) {
+        this.tokenAccess = tokenAccess;
     }
 }

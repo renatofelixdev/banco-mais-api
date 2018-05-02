@@ -57,6 +57,16 @@ create table bank_agency (
   constraint pk_bank_agency primary key (id)
 );
 
+create table token_access (
+  id                            bigserial not null,
+  active                        boolean,
+  removed                       boolean,
+  token                         varchar(255),
+  date_created                  timestamp not null,
+  date_updated                  timestamp not null,
+  constraint pk_token_access primary key (id)
+);
+
 create table user_client (
   id                            bigserial not null,
   active                        boolean,
@@ -65,8 +75,10 @@ create table user_client (
   cpf                           varchar(255),
   address                       varchar(255),
   password                      varchar(255),
+  token_access_id               bigint,
   date_created                  timestamp not null,
   date_updated                  timestamp not null,
+  constraint uq_user_client_token_access_id unique (token_access_id),
   constraint pk_user_client primary key (id)
 );
 
@@ -95,6 +107,8 @@ alter table bank_account add constraint fk_bank_account_user_client_id foreign k
 alter table bank_agency add constraint fk_bank_agency_bank_id foreign key (bank_id) references bank (id) on delete restrict on update restrict;
 create index ix_bank_agency_bank_id on bank_agency (bank_id);
 
+alter table user_client add constraint fk_user_client_token_access_id foreign key (token_access_id) references token_access (id) on delete restrict on update restrict;
+
 
 # --- !Downs
 
@@ -112,6 +126,8 @@ alter table if exists bank_account drop constraint if exists fk_bank_account_use
 alter table if exists bank_agency drop constraint if exists fk_bank_agency_bank_id;
 drop index if exists ix_bank_agency_bank_id;
 
+alter table if exists user_client drop constraint if exists fk_user_client_token_access_id;
+
 drop table if exists account_history cascade;
 
 drop table if exists bank cascade;
@@ -119,6 +135,8 @@ drop table if exists bank cascade;
 drop table if exists bank_account cascade;
 
 drop table if exists bank_agency cascade;
+
+drop table if exists token_access cascade;
 
 drop table if exists user_client cascade;
 

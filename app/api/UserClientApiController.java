@@ -1,10 +1,12 @@
 package api;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import dao.TokenAccessDAO;
 import dao.UserClientDAO;
 import enums.NotificationStatus;
 import helpers.UserClientHelper;
 import models.Notification;
+import models.TokenAccess;
 import models.UserClient;
 import org.apache.oltu.oauth2.as.issuer.MD5Generator;
 import org.apache.oltu.oauth2.as.issuer.OAuthIssuer;
@@ -28,12 +30,17 @@ import validators.UserClientValidator;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Optional;
 
 public class UserClientApiController extends Controller implements ApiController {
 
     @Inject
     private UserClientDAO userClientDAO;
+
+    @Inject
+    private TokenAccessDAO tokenAccessDAO;
 
     @Inject
     private Utils utils;
@@ -188,19 +195,35 @@ public class UserClientApiController extends Controller implements ApiController
                         "Falha na autenticação!")));
             }
 
-            Optional<UserClient> userClientOptional = userClientDAO.search(password, agency, account);
+            Optional<UserClient> userClientOptional = userClientDAO.search(utils.safePassword(password), agency, account);
             if(userClientOptional.isPresent()) {
                 OAuthIssuer oauthIssuerImpl = new OAuthIssuerImpl(new MD5Generator());
                 String token = oauthIssuerImpl.accessToken();
                 UserClient userClient = userClientOptional.get();
-                userClient.setToken(token);
-                OAuthResponse response = OAuthASResponse
-                        .tokenResponse(HttpServletResponse.SC_OK)
-                        .setAccessToken(oauthIssuerImpl.accessToken())
-                        .setTokenType(OAuth.DEFAULT_TOKEN_TYPE.toString())
-                        .setExpiresIn("3600")
-                        .buildJSONMessage();
-                return utils.ok(Json.toJson(response));
+
+                if(userClient.getTokenAccess() == null) {
+                    TokenAccess tokenAccess = new TokenAccess(token);
+                    tokenAccess.save();
+                    userClient.setTokenAccess(tokenAccess);
+                    userClient.update();
+                }else {
+                    Instant timeNow = Instant.now();
+                    Duration duration = Duration.between(userClient.getTokenAccess().getDateCreated().toInstant(), timeNow);
+
+                    //24hrs RENOVAÇÃO DO TOKEN
+                    if (duration.getSeconds() > 86400) {
+                        TokenAccess tokenAccess = userClient.getTokenAccess();
+
+                        TokenAccess newToken = new TokenAccess(token);
+                        newToken.save();
+                        userClient.setTokenAccess(newToken);
+                        userClient.update();
+
+                        tokenAccess.delete();
+                    }
+                }
+
+                return utils.ok(Json.toJson(userClient));
             }else{
                 return utils.badRequest(Json.toJson(utils.notification(NotificationStatus.WARNING,
                         "Usuário ou senha inválidos!")));
