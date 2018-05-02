@@ -1,5 +1,6 @@
 package api;
 
+import authenticators.UserClientAuthenticator;
 import com.fasterxml.jackson.databind.JsonNode;
 import dao.TokenAccessDAO;
 import dao.UserClientDAO;
@@ -22,6 +23,7 @@ import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Http;
 import play.mvc.Result;
+import play.mvc.Security;
 import util.NameEntity;
 import util.OAuthAttr;
 import util.Utils;
@@ -52,6 +54,7 @@ public class UserClientApiController extends Controller implements ApiController
     private UserClientHelper userClientHelper;
 
     @Override
+    @Security.Authenticated(UserClientAuthenticator.class)
     public Result all() {
         return utils.ok(Json.toJson(userClientDAO.all()));
     }

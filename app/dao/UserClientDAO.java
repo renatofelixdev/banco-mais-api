@@ -36,4 +36,11 @@ public class UserClientDAO implements ApiDAO {
                     .eq("bankAccountList.bankAgency.code", agency)
                     .findUnique());
     }
+
+    public Optional<UserClient> withToken(String token) {
+        return Optional.ofNullable(userClientFinder.where()
+                    .eq("removed", false)
+                    .eq("tokenAccess.token", token)
+                    .findUnique());
+    }
 }
