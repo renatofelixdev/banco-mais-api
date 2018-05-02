@@ -16,6 +16,7 @@ public class UserClientHelper {
         userClient.setName(utils.getValueFromJson(json, "name"));
         userClient.setCpf(utils.getValueFromJson(json, "cpf"));
         userClient.setAddress(utils.getValueFromJson(json, "address"));
+        userClient.setPassword(utils.safePassword(utils.getValueFromJson(json, "password")));
         return userClient;
     }
 
@@ -23,6 +24,7 @@ public class UserClientHelper {
         userClient.setName(utils.getValueFromJson(json, "name"));
         userClient.setCpf(utils.getValueFromJson(json, "cpf"));
         userClient.setAddress(utils.getValueFromJson(json, "address"));
+        userClient.setPassword(utils.safePassword(utils.getValueFromJson(json, "password")));
         return userClient;
     }
 }

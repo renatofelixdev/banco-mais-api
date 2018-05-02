@@ -148,11 +148,14 @@ public class UserClientApiController extends Controller implements ApiController
         //JAVA 8 OPTIONAL E LAMBDAS
         return userClient
                 .map(u -> {
-                        userClientHelper.fill(u,json);
+                        u = userClientHelper.fill(u,json);
+                        u.update();
                         return u;
                 })
                 .orElseGet(() -> {
-                        return userClientHelper.fill(json);
+                        UserClient u = userClientHelper.fill(json);
+                        u.save();
+                        return u;
                 });
 
         /*if(userClient == null){
