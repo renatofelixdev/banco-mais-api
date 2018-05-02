@@ -6,14 +6,28 @@ import enums.NotificationStatus;
 import helpers.UserClientHelper;
 import models.Notification;
 import models.UserClient;
+import org.apache.oltu.oauth2.as.issuer.MD5Generator;
+import org.apache.oltu.oauth2.as.issuer.OAuthIssuer;
+import org.apache.oltu.oauth2.as.issuer.OAuthIssuerImpl;
+import org.apache.oltu.oauth2.as.request.OAuthTokenRequest;
+import org.apache.oltu.oauth2.as.response.OAuthASResponse;
+import org.apache.oltu.oauth2.common.OAuth;
+import org.apache.oltu.oauth2.common.exception.OAuthProblemException;
+import org.apache.oltu.oauth2.common.exception.OAuthSystemException;
+import org.apache.oltu.oauth2.common.message.OAuthResponse;
+import org.h2.engine.User;
 import play.libs.Json;
 import play.mvc.Controller;
+import play.mvc.Http;
 import play.mvc.Result;
 import util.NameEntity;
+import util.OAuthAttr;
 import util.Utils;
 import validators.UserClientValidator;
 
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.Optional;
 
 public class UserClientApiController extends Controller implements ApiController {
@@ -149,5 +163,49 @@ public class UserClientApiController extends Controller implements ApiController
             userClient.update();
         }
         return userClient;*/
+    }
+
+    public Result login(){
+        try {
+            JsonNode json = request().body().asJson();
+
+            String clientId = utils.getValueFromJson(json, "clientId");
+            String clientSecret = utils.getValueFromJson(json, "clientSecret");
+            String password = utils.getValueFromJson(json, "password");
+            String agency = utils.getValueFromJson(json, "agency");
+            String account = utils.getValueFromJson(json, "account");
+
+            if(!clientId.equals(OAuthAttr.CLIENT_ID)){
+                return utils.badRequest(Json.toJson(utils.notification(NotificationStatus.ERROR,
+                        "Falha na autenticação!")));
+            }
+
+            if(!clientSecret.equals(OAuthAttr.CLIENT_SECRET)){
+                return utils.badRequest(Json.toJson(utils.notification(NotificationStatus.ERROR,
+                        "Falha na autenticação!")));
+            }
+
+            Optional<UserClient> userClientOptional = userClientDAO.search(password, agency, account);
+            if(userClientOptional.isPresent()) {
+                OAuthIssuer oauthIssuerImpl = new OAuthIssuerImpl(new MD5Generator());
+                String token = oauthIssuerImpl.accessToken();
+                UserClient userClient = userClientOptional.get();
+                userClient.setToken(token);
+                OAuthResponse response = OAuthASResponse
+                        .tokenResponse(HttpServletResponse.SC_OK)
+                        .setAccessToken(oauthIssuerImpl.accessToken())
+                        .setTokenType(OAuth.DEFAULT_TOKEN_TYPE.toString())
+                        .setExpiresIn("3600")
+                        .buildJSONMessage();
+                return utils.ok(Json.toJson(response));
+            }else{
+                return utils.badRequest(Json.toJson(utils.notification(NotificationStatus.WARNING,
+                        "Usuário ou senha inválidos!")));
+            }
+
+        } catch (OAuthSystemException e) {
+            return utils.badRequest(Json.toJson(utils.notification(NotificationStatus.ERROR,
+                    "Erro ao tentar autenticar usuário!Tente novamente!")));
+        }
     }
 }

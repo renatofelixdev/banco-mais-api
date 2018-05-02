@@ -9,6 +9,7 @@ scalaVersion := "2.11.11"
 
 libraryDependencies ++= Seq(
   "org.postgresql" % "postgresql" % "9.4.1212.jre7",
+  "org.apache.oltu.oauth2" % "org.apache.oltu.oauth2.authzserver" % "1.0.0",
   javaJdbc,
   cache,
   javaWs

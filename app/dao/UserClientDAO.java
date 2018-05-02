@@ -27,4 +27,13 @@ public class UserClientDAO implements ApiDAO {
                 .eq("cpf", cpf)
                 .findUnique());
     }
+
+    public Optional<UserClient> search(String password, String agency, String account) {
+        return  Optional.ofNullable(userClientFinder.where()
+                    .eq("removed", false)
+                    .eq("password", password)
+                    .eq("bankAccountList.number", account)
+                    .eq("bankAccountList.bankAgency.code", agency)
+                    .findUnique());
+    }
 }

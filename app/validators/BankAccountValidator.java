@@ -26,7 +26,7 @@ public class BankAccountValidator extends  ApiValidator{
 
     private void validAccountType(JsonNode json, String obj) {
         if(json.get(obj) != null && !json.get(obj).asText().isEmpty()){
-            if(BankAccountType.parse(obj) == null){
+            if(BankAccountType.parse(json.get(obj).asText()) == null){
                 validators.put(obj, "Tipo de conta inválido");
                 notification.setStatus(NotificationStatus.ERROR);
                 notification.setValidators(validators);

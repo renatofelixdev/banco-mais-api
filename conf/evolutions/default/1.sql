@@ -64,6 +64,7 @@ create table user_client (
   name                          varchar(255),
   cpf                           varchar(255),
   address                       varchar(255),
+  password                      varchar(255),
   date_created                  timestamp not null,
   date_updated                  timestamp not null,
   constraint pk_user_client primary key (id)
