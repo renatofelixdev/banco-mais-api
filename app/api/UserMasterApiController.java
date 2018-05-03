@@ -61,7 +61,7 @@ public class UserMasterApiController extends Controller {
                         "Falha na autenticação!")));
             }
 
-            Optional<UserMaster> userMasterOptional = userMasterDAO.withLoginAndPassword(utils.safePassword(password), login);
+            Optional<UserMaster> userMasterOptional = userMasterDAO.withLoginAndPassword(login, utils.safePassword(password));
             if(userMasterOptional.isPresent()) {
                 OAuthIssuer oauthIssuerImpl = new OAuthIssuerImpl(new MD5Generator());
                 String token = oauthIssuerImpl.accessToken();

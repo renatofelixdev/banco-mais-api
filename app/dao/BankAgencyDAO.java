@@ -15,6 +15,7 @@ public class BankAgencyDAO implements ApiDAO {
     public List<BankAgency> all() {
         return bankAgencyFinder.where()
                 .eq("removed", false)
+                .orderBy("bank.name asc")
                 .findList();
     }
 

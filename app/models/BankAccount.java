@@ -20,7 +20,7 @@ public class BankAccount extends ModelMaster {
     @ManyToOne
     private BankAgency bankAgency;
 
-    @OneToOne
+    @ManyToOne
     private UserClient userClient;
 
     public String getNumber() {

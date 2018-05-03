@@ -13,6 +13,7 @@ public class BankDAO implements ApiDAO {
     public List<Bank> all() {
         return bankFinder.where()
                 .eq("removed", false)
+                .orderBy("name asc")
                 .findList();
     }
 

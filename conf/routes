@@ -34,6 +34,7 @@ PUT     /api/user-client/:id                       api.UserClientApiController.u
 PUT     /api/user-client/:id/status                api.UserClientApiController.alterStatus(id:Long)
 DELETE  /api/user-client/:id                       api.UserClientApiController.delete(id:Long)
 POST    /api/user-client/login                     api.UserClientApiController.login
+POST    /api/user-master/login                      api.UserMasterApiController.login
 
 POST    /api/bank-statement                         api.BankingOperationApiController.bankStatement
 POST    /api/deposit                                api.BankingOperationApiController.deposit

@@ -1,5 +1,6 @@
 package api;
 
+import authenticators.UserMasterAuthenticator;
 import com.fasterxml.jackson.databind.JsonNode;
 import dao.BankAccountDAO;
 import dao.BankAgencyDAO;
@@ -16,6 +17,7 @@ import org.h2.engine.User;
 import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Result;
+import play.mvc.Security;
 import util.NameEntity;
 import util.Utils;
 import validators.BankAccountValidator;
@@ -54,6 +56,7 @@ public class BankAccountApiController extends Controller implements ApiControlle
     private UserClientApiController userClientApiController;
 
     @Override
+    @Security.Authenticated(UserMasterAuthenticator.class)
     public Result all() {
         return utils.ok(Json.toJson(bankAccountDAO.all()));
     }
@@ -95,6 +98,7 @@ public class BankAccountApiController extends Controller implements ApiControlle
     }
 
     @Override
+    @Security.Authenticated(UserMasterAuthenticator.class)
     public Result save() {
         JsonNode json = request().body().asJson();
 
@@ -126,6 +130,7 @@ public class BankAccountApiController extends Controller implements ApiControlle
     }
 
     @Override
+    @Security.Authenticated(UserMasterAuthenticator.class)
     public Result update(Long id) {
         JsonNode json = request().body().asJson();
 
@@ -152,6 +157,7 @@ public class BankAccountApiController extends Controller implements ApiControlle
     }
 
     @Override
+    @Security.Authenticated(UserMasterAuthenticator.class)
     public Result delete(Long id) {
         Optional<BankAccount> bankAccountOptional = bankAccountDAO.byId(id);
         Result result = utils.valid(bankAccountOptional, NameEntity.BANK_ACCOUNT);
@@ -166,6 +172,7 @@ public class BankAccountApiController extends Controller implements ApiControlle
     }
 
     @Override
+    @Security.Authenticated(UserMasterAuthenticator.class)
     public Result alterStatus(Long id) {
         Optional<BankAccount> bankAccountOptional = bankAccountDAO.byId(id);
         Result result = utils.valid(bankAccountOptional, NameEntity.BANK_ACCOUNT);

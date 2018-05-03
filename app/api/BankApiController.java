@@ -1,5 +1,6 @@
 package api;
 
+import authenticators.UserMasterAuthenticator;
 import com.fasterxml.jackson.databind.JsonNode;
 import dao.BankDAO;
 import enums.NotificationStatus;
@@ -9,6 +10,7 @@ import models.Notification;
 import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Result;
+import play.mvc.Security;
 import util.NameEntity;
 import util.Utils;
 import validators.BankValidator;
@@ -31,6 +33,7 @@ public class BankApiController extends Controller implements ApiController {
     private BankHelper bankHelper;
 
     @Override
+    @Security.Authenticated(UserMasterAuthenticator.class)
     public Result all() {
         return utils.ok(Json.toJson(bankDAO.all()));
     }
@@ -46,6 +49,7 @@ public class BankApiController extends Controller implements ApiController {
     }
 
     @Override
+    @Security.Authenticated(UserMasterAuthenticator.class)
     public Result save() {
         JsonNode json = request().body().asJson();
 
@@ -62,6 +66,7 @@ public class BankApiController extends Controller implements ApiController {
     }
 
     @Override
+    @Security.Authenticated(UserMasterAuthenticator.class)
     public Result update(Long id) {
         JsonNode json = request().body().asJson();
 
@@ -84,6 +89,7 @@ public class BankApiController extends Controller implements ApiController {
     }
 
     @Override
+    @Security.Authenticated(UserMasterAuthenticator.class)
     public Result delete(Long id) {
         Optional<Bank> bankOptional = bankDAO.byId(id);
 
@@ -99,6 +105,7 @@ public class BankApiController extends Controller implements ApiController {
     }
 
     @Override
+    @Security.Authenticated(UserMasterAuthenticator.class)
     public Result alterStatus(Long id) {
         Optional<Bank> bankOptional = bankDAO.byId(id);
 

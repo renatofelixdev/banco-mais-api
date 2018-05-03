@@ -41,7 +41,6 @@ create table bank_account (
   date_created                  timestamp not null,
   date_updated                  timestamp not null,
   constraint ck_bank_account_bank_account_type check (bank_account_type in ('SAVINGS_ACCOUNT','CHECKING_ACCOUNT')),
-  constraint uq_bank_account_user_client_id unique (user_client_id),
   constraint pk_bank_account primary key (id)
 );
 
@@ -88,8 +87,10 @@ create table user_master (
   removed                       boolean,
   login                         varchar(255),
   password                      varchar(255),
+  token_access_id               bigint,
   date_created                  timestamp not null,
   date_updated                  timestamp not null,
+  constraint uq_user_master_token_access_id unique (token_access_id),
   constraint pk_user_master primary key (id)
 );
 
@@ -103,11 +104,14 @@ alter table bank_account add constraint fk_bank_account_bank_agency_id foreign k
 create index ix_bank_account_bank_agency_id on bank_account (bank_agency_id);
 
 alter table bank_account add constraint fk_bank_account_user_client_id foreign key (user_client_id) references user_client (id) on delete restrict on update restrict;
+create index ix_bank_account_user_client_id on bank_account (user_client_id);
 
 alter table bank_agency add constraint fk_bank_agency_bank_id foreign key (bank_id) references bank (id) on delete restrict on update restrict;
 create index ix_bank_agency_bank_id on bank_agency (bank_id);
 
 alter table user_client add constraint fk_user_client_token_access_id foreign key (token_access_id) references token_access (id) on delete restrict on update restrict;
+
+alter table user_master add constraint fk_user_master_token_access_id foreign key (token_access_id) references token_access (id) on delete restrict on update restrict;
 
 
 # --- !Downs
@@ -122,11 +126,14 @@ alter table if exists bank_account drop constraint if exists fk_bank_account_ban
 drop index if exists ix_bank_account_bank_agency_id;
 
 alter table if exists bank_account drop constraint if exists fk_bank_account_user_client_id;
+drop index if exists ix_bank_account_user_client_id;
 
 alter table if exists bank_agency drop constraint if exists fk_bank_agency_bank_id;
 drop index if exists ix_bank_agency_bank_id;
 
 alter table if exists user_client drop constraint if exists fk_user_client_token_access_id;
+
+alter table if exists user_master drop constraint if exists fk_user_master_token_access_id;
 
 drop table if exists account_history cascade;
 

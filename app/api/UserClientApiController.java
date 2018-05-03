@@ -1,6 +1,7 @@
 package api;
 
 import authenticators.UserClientAuthenticator;
+import authenticators.UserMasterAuthenticator;
 import com.fasterxml.jackson.databind.JsonNode;
 import dao.TokenAccessDAO;
 import dao.UserClientDAO;
@@ -55,7 +56,7 @@ public class UserClientApiController extends Controller implements ApiController
     private UserClientHelper userClientHelper;
 
     @Override
-    @Security.Authenticated(UserClientAuthenticator.class)
+    @Security.Authenticated(UserMasterAuthenticator.class)
     public Result all() {
         return utils.ok(Json.toJson(userClientDAO.all()));
     }
@@ -71,6 +72,7 @@ public class UserClientApiController extends Controller implements ApiController
     }
 
     @Override
+    @Security.Authenticated(UserMasterAuthenticator.class)
     public Result save() {
         JsonNode json = request().body().asJson();
 
@@ -93,6 +95,7 @@ public class UserClientApiController extends Controller implements ApiController
     }
 
     @Override
+    @Security.Authenticated(UserMasterAuthenticator.class)
     public Result update(Long id) {
         JsonNode json = request().body().asJson();
 
@@ -125,6 +128,7 @@ public class UserClientApiController extends Controller implements ApiController
     }
 
     @Override
+    @Security.Authenticated(UserMasterAuthenticator.class)
     public Result delete(Long id) {
         Optional<UserClient> userClientOptional = userClientDAO.byId(id);
 
@@ -140,6 +144,7 @@ public class UserClientApiController extends Controller implements ApiController
     }
 
     @Override
+    @Security.Authenticated(UserMasterAuthenticator.class)
     public Result alterStatus(Long id) {
         Optional<UserClient> userClientOptional = userClientDAO.byId(id);
 
