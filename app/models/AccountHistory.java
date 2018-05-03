@@ -5,6 +5,7 @@ import play.data.format.Formats;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 @Entity
@@ -64,5 +65,15 @@ public class AccountHistory extends ModelMaster {
 
     public void setTarget(BankAccount target) {
         this.target = target;
+    }
+
+    @Transient
+    public String getOperationDescription() {
+        return this.operation.getDescription();
+    }
+
+    @Transient
+    public String getDateFormated() {
+        return new SimpleDateFormat("dd/MM/yyyy").format(date);
     }
 }

@@ -1,5 +1,6 @@
 package api;
 
+import authenticators.UserClientAuthenticator;
 import com.fasterxml.jackson.databind.JsonNode;
 import dao.AccountHistoryDAO;
 import dao.BankAccountDAO;
@@ -11,6 +12,7 @@ import models.Notification;
 import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Result;
+import play.mvc.Security;
 import util.NameEntity;
 import util.Utils;
 import validators.BankingOperationValidator;
@@ -35,6 +37,7 @@ public class BankingOperationApiController extends Controller {
     @Inject
     private AccountHistoryDAO accountHistoryDAO;
 
+    @Security.Authenticated(UserClientAuthenticator.class)
     public Result bankStatement(){
         JsonNode json = request().body().asJson();
 
@@ -61,6 +64,8 @@ public class BankingOperationApiController extends Controller {
         return utils.ok(Json.toJson(accountHistoryDAO.byBankAccount(bankAccount.get(), start, end)));
     }
 
+
+    @Security.Authenticated(UserClientAuthenticator.class)
     public Result deposit(){
         JsonNode json = request().body().asJson();
 
@@ -93,6 +98,8 @@ public class BankingOperationApiController extends Controller {
                 "Depósito realizado com sucesso!")));
     }
 
+
+    @Security.Authenticated(UserClientAuthenticator.class)
     public Result bankTransfer(){
         JsonNode json = request().body().asJson();
 
@@ -142,6 +149,8 @@ public class BankingOperationApiController extends Controller {
                 "Transferência realizada com sucesso!")));
     }
 
+
+    @Security.Authenticated(UserClientAuthenticator.class)
     public Result accountWithDrawal(){
         JsonNode json = request().body().asJson();
 

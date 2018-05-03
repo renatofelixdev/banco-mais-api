@@ -58,7 +58,7 @@ public abstract class ApiValidator {
 
     protected void validDate(JsonNode json, String obj){
         if(json.get(obj) != null && !json.get(obj).asText().isEmpty()) {
-            DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
+            DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
             df.setLenient(false);
             try {
                 Date dt = df.parse(json.get(obj).asText());

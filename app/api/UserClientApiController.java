@@ -191,8 +191,7 @@ public class UserClientApiController extends Controller implements ApiController
             String clientId = utils.getValueFromJson(json, "clientId");
             String clientSecret = utils.getValueFromJson(json, "clientSecret");
             String password = utils.getValueFromJson(json, "password");
-            String agency = utils.getValueFromJson(json, "agency");
-            String account = utils.getValueFromJson(json, "account");
+            String cpf = utils.getValueFromJson(json, "cpf");
 
             if(!clientId.equals(OAuthAttr.CLIENT_ID)){
                 return utils.badRequest(Json.toJson(utils.notification(NotificationStatus.ERROR,
@@ -204,7 +203,7 @@ public class UserClientApiController extends Controller implements ApiController
                         "Falha na autenticação!")));
             }
 
-            Optional<UserClient> userClientOptional = userClientDAO.search(utils.safePassword(password), agency, account);
+            Optional<UserClient> userClientOptional = userClientDAO.search(utils.safePassword(password), cpf);
             if(userClientOptional.isPresent()) {
                 OAuthIssuer oauthIssuerImpl = new OAuthIssuerImpl(new MD5Generator());
                 String token = oauthIssuerImpl.accessToken();

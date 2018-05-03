@@ -153,7 +153,7 @@ public class Utils {
     }
 
     public Date getDateFrom(String date){
-        DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
         df.setLenient(false);
         try {
             return df.parse(date);

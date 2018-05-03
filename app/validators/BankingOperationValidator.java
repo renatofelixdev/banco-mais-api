@@ -50,10 +50,13 @@ public class BankingOperationValidator extends ApiValidator{
         super.requiredField(json, "bank");
         super.requiredField(json, "agency");
         super.requiredField(json, "account");
-        super.requiredField(json, "sameBank");
+        super.requiredField(json, "bankTarget");
+        super.requiredField(json, "agencyTarget");
+        super.requiredField(json, "accountTarget");
+        //super.requiredField(json, "sameBank");
 
         super.validDecimal(json, "value");
-        super.validBoolean(json, "sameBank");
+        //super.validBoolean(json, "sameBank");
 
         if(notification.getStatus() == NotificationStatus.ERROR)
             notification.setMessage("Há erros no formulário, verifique os dados e tente novamente!");

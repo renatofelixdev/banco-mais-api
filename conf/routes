@@ -18,7 +18,7 @@ PUT     /api/bank-agency/:id/status                api.BankAgencyApiController.a
 DELETE  /api/bank-agency/:id                       api.BankAgencyApiController.delete(id:Long)
 
 GET     /api/bank-accounts                          api.BankAccountApiController.all
-GET     /api/bank-accounts/user-client/:idUser      api.BankAccountApiController.byUserClient(idUser:Long)
+GET     /api/bank-accounts/user-client                api.BankAccountApiController.byUserClient()
 GET     /api/bank-accounts/bank-agency/:idAgency    api.BankAccountApiController.byBankAgency(idAgency:Long)
 GET     /api/bank-account/types                     api.BankAccountApiController.getTypes
 GET     /api/bank-account/:id                       api.BankAccountApiController.byId(id:Long)

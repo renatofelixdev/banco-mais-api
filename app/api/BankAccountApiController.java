@@ -1,5 +1,6 @@
 package api;
 
+import authenticators.UserClientAuthenticator;
 import authenticators.UserMasterAuthenticator;
 import com.fasterxml.jackson.databind.JsonNode;
 import dao.BankAccountDAO;
@@ -16,6 +17,7 @@ import models.UserClient;
 import org.h2.engine.User;
 import play.libs.Json;
 import play.mvc.Controller;
+import play.mvc.Http;
 import play.mvc.Result;
 import play.mvc.Security;
 import util.NameEntity;
@@ -61,14 +63,15 @@ public class BankAccountApiController extends Controller implements ApiControlle
         return utils.ok(Json.toJson(bankAccountDAO.all()));
     }
 
-    public Result byUserClient(Long id){
 
-        Optional<UserClient> userClient = userClientDAO.byId(id);
+    @Security.Authenticated(UserClientAuthenticator.class)
+    public Result byUserClient(){
+        UserClient userClient = (UserClient) utils.mapGetValue(Http.Context.current().args, "userClient");
 
-        Result result = utils.valid(userClient, NameEntity.USER_CLIENT);
+        Result result = utils.valid(Optional.ofNullable(userClient), NameEntity.USER_CLIENT);
         if (result != null) return result;
 
-        return utils.ok(Json.toJson(userClient.get().getBankAccountList()));
+        return utils.ok(Json.toJson(userClient.getBankAccountList()));
 
     }
 

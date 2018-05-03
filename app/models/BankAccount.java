@@ -43,6 +43,10 @@ public class BankAccount extends ModelMaster {
         return bankAccountType;
     }
 
+    public String getBankAccountTypeDescription() {
+        return bankAccountType.getDescription();
+    }
+
     public void setBankAccountType(BankAccountType bankAccountType) {
         this.bankAccountType = bankAccountType;
     }
